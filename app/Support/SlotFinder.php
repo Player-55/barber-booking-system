@@ -88,7 +88,7 @@ class SlotFinder
      *
      * @return array<int, array{value: string, label: string, available: bool}>
      */
-    public function daySlots(Service $service, string $date): array
+    public function daySlots(Service $service, string $date, ?array $onlyBarberIds = null): array
     {
         $this->reason = null;
         $day = Carbon::parse($date);
@@ -100,8 +100,13 @@ class SlotFinder
         }
 
         $barberIds = $this->workingBarberIds($day);
+        if ($onlyBarberIds !== null) {
+            $barberIds = array_values(array_intersect($barberIds, $onlyBarberIds));
+        }
         if (empty($barberIds)) {
-            $this->reason = 'No barbers are working on this day. Please choose another date.';
+            $this->reason = $onlyBarberIds !== null
+                ? 'This barber is not working on this day.'
+                : 'No barbers are working on this day. Please choose another date.';
             return [];
         }
 
@@ -136,7 +141,7 @@ class SlotFinder
      *
      * @return array<int, int>
      */
-    public function freeBarberIds(Service $service, string $date, string $startTime): array
+    public function freeBarberIds(Service $service, string $date, string $startTime, ?array $onlyBarberIds = null, bool $anyMinute = false): array
     {
         $day   = Carbon::parse($date);
         $hours = OpeningHour::where('day_of_week', $day->dayOfWeek)->first();
@@ -146,11 +151,18 @@ class SlotFinder
 
         $duration = (int) $service->duration_minutes;
         $start    = $this->toMinutes($startTime);
-        if (! in_array($start, $this->candidateStarts($hours, $duration, $day), true)) {
+
+        $fits = $anyMinute
+            ? $this->fitsAnyMinute($hours, $duration, $day, $start)          // walk-ins: any minute, e.g. "start now"
+            : in_array($start, $this->candidateStarts($hours, $duration, $day), true); // online: 30-min slots only
+        if (! $fits) {
             return []; // outside hours, in the break, or already passed
         }
 
-        $barberIds     = $this->workingBarberIds($day);
+        $barberIds = $this->workingBarberIds($day);
+        if ($onlyBarberIds !== null) {
+            $barberIds = array_values(array_intersect($barberIds, $onlyBarberIds));
+        }
         $takenByBarber = $this->takenByBarber($barberIds, $day);
 
         return array_values(array_filter(
@@ -181,6 +193,33 @@ class SlotFinder
         }
 
         return $starts;
+    }
+
+    /**
+     * Walk-in check: inside opening hours, not in the break, and not more than
+     * 15 minutes in the past (so the owner can log a customer who just sat down).
+     */
+    private function fitsAnyMinute(OpeningHour $hours, int $duration, Carbon $day, int $start): bool
+    {
+        $open  = $this->toMinutes($hours->open_time);
+        $close = $this->toMinutes($hours->close_time);
+        $end   = $start + $duration;
+
+        if ($start < $open || $end > $close) {
+            return false;
+        }
+        if ($hours->break_start && $hours->break_end
+            && $start < $this->toMinutes($hours->break_end) && $end > $this->toMinutes($hours->break_start)) {
+            return false;
+        }
+        if ($day->isToday() && $start < now()->hour * 60 + now()->minute - 15) {
+            return false;
+        }
+        if ($day->lt(today())) {
+            return false;
+        }
+
+        return true;
     }
 
     /** Active barbers who are not on a day off. */

@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\BarberController;
 use App\Http\Controllers\Admin\CommissionController;
 use App\Http\Controllers\Admin\ScheduleController;
 use App\Http\Controllers\Admin\ServiceController;
+use App\Http\Controllers\Admin\WalkInController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BookingController;
 use App\Models\Barber;
@@ -73,6 +74,11 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::put('/schedule/hours', [ScheduleController::class, 'updateHours'])->name('schedule.hours');
     Route::post('/schedule/days-off', [ScheduleController::class, 'storeDayOff'])->name('schedule.daysoff.store');
     Route::delete('/schedule/days-off/{dayOff}', [ScheduleController::class, 'destroyDayOff'])->name('schedule.daysoff.destroy');
+
+    // Walk-in / phone bookings added by the owner
+    Route::get('/walk-in', [WalkInController::class, 'create'])->name('walkin.create');
+    Route::get('/walk-in/slots', [WalkInController::class, 'slots'])->name('walkin.slots');
+    Route::post('/walk-in', [WalkInController::class, 'store'])->name('walkin.store');
 
     // Barber commission
     Route::get('/commission', [CommissionController::class, 'index'])->name('commission.index');

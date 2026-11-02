@@ -151,4 +151,10 @@ return [
     /* Logo file inside /public (swap this for the client's own logo) */
     'shop_logo' => env('SHOP_LOGO', 'images/logo.svg'),
 
+    /* Shop details shown on the booking page (leave empty in .env to hide) */
+    'shop_tagline' => env('SHOP_TAGLINE', 'Book your appointment online • 24/7'),
+    'shop_branch'  => env('SHOP_BRANCH', ''),
+    'shop_address' => env('SHOP_ADDRESS', ''),
+    'shop_social'  => env('SHOP_SOCIAL', ''),
+
 ];

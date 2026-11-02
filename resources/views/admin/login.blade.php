@@ -12,7 +12,7 @@
 
     <div class="w-full max-w-sm bg-zinc-900/80 border border-amber-500/20 p-8 rounded-3xl backdrop-blur-xl shadow-2xl">
         <div class="text-center mb-6">
-            <img src="{{ asset(config('app.shop_logo')) }}" alt="Logo" class="w-20 h-20 mx-auto mb-3">
+            <img src="{{ asset(config('app.shop_logo')) }}" alt="Logo" class="w-20 h-20 mx-auto mb-3 rounded-full object-cover">
             <h1 class="text-xl font-extrabold text-amber-400 uppercase tracking-wider">Admin Access</h1>
             <p class="text-xs text-zinc-400 mt-1">Owner login</p>
         </div>

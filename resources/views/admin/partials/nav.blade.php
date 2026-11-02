@@ -2,7 +2,7 @@
 <nav class="border-b border-zinc-800/80 bg-zinc-950/60 backdrop-blur-md sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-3">
-            <img src="{{ asset(config('app.shop_logo')) }}" alt="Logo" class="w-10 h-10">
+            <img src="{{ asset(config('app.shop_logo')) }}" alt="Logo" class="w-10 h-10 rounded-full object-cover">
             <div>
                 <h1 class="text-sm font-bold text-amber-400 uppercase tracking-wider">{{ config('app.name') }}</h1>
                 <p class="text-[10px] text-zinc-400">Admin Control Center</p>

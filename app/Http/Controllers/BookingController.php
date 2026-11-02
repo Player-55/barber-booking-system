@@ -115,6 +115,7 @@ class BookingController extends Controller
             'name'    => $booking->customer_name,
             'service' => $serviceName,
             'barber'  => $barberName,
+            'barber_whatsapp' => Barber::find($booking->barber_id)?->whatsappNumber(),
             'date'    => $formattedDate,
             'time'    => $formattedTime,
         ]);

@@ -61,14 +61,14 @@
     <header class="pt-10 pb-6 text-center relative z-10 max-w-4xl mx-auto px-4">
         <div class="inline-block relative group mb-4">
             <div class="absolute -inset-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-700 opacity-25 blur-lg group-hover:opacity-50 transition duration-500"></div>
-            <img src="{{ asset(config('app.shop_logo')) }}" alt="{{ config('app.name') }} logo" class="relative w-28 h-28 sm:w-32 sm:h-32 mx-auto drop-shadow-2xl">
+            <img src="{{ asset(config('app.shop_logo')) }}" alt="{{ config('app.name') }} logo" class="relative w-28 h-28 sm:w-32 sm:h-32 mx-auto rounded-full object-cover drop-shadow-2xl">
         </div>
 
         <h1 class="text-3xl sm:text-4xl font-extrabold tracking-wider text-amber-400 uppercase">
             {{ config('app.name') }}
         </h1>
         <p class="text-xs sm:text-sm tracking-widest text-zinc-400 font-medium uppercase mt-1">
-            Book your appointment online &bull; 24/7
+            {{ config('app.shop_tagline') }}
         </p>
     </header>
 
@@ -85,7 +85,7 @@
                     </div>
                     <div>
                         <h2 class="text-base font-bold text-zinc-100 tracking-wide uppercase">Opening Hours</h2>
-                        <p class="text-xs text-zinc-400">When we are open</p>
+                        <p class="text-xs text-zinc-400">{{ config('app.shop_branch') ?: 'When we are open' }}</p>
                     </div>
                 </div>
 
@@ -130,6 +130,7 @@
                         @endif
                     </div>
                     <div class="flex items-center gap-2 text-zinc-400">
+                        {{ config('app.shop_social') }}
                     </div>
                 </div>
             </div>
@@ -150,14 +151,34 @@
                     @foreach($barbers as $barber)
                         <div class="p-3 rounded-2xl bg-zinc-950/60 border border-zinc-800/60 flex items-center gap-3">
                             <div class="w-9 h-9 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center font-bold text-amber-400 text-sm">{{ strtoupper(mb_substr($barber->name, 0, 1)) }}</div>
-                            <div>
+                            <div class="min-w-0 flex-1">
                                 <p class="text-xs font-bold text-zinc-200">{{ $barber->name }}</p>
                                 <p class="text-[10px] text-zinc-500">{{ $barber->specialty }}</p>
                             </div>
+                            @if($barber->whatsappNumber())
+                                <a href="https://wa.me/{{ $barber->whatsappNumber() }}?text={{ urlencode('Hi ' . $barber->name . ', I have a question about booking at ' . config('app.name') . '.') }}"
+                                   target="_blank" rel="noopener" title="WhatsApp {{ $barber->name }}"
+                                   class="shrink-0 w-8 h-8 rounded-full bg-emerald-600 hover:bg-emerald-500 flex items-center justify-center shadow-md">
+                                    <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3a.5.5 0 0 0 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.5-.3Z"/></svg>
+                                </a>
+                            @endif
                         </div>
                     @endforeach
                 </div>
             </div>
+
+            @if(config('app.shop_address'))
+                <!-- Shop Address -->
+                <div class="px-6 py-4 rounded-2xl bg-zinc-950/50 border border-zinc-800/50 text-xs text-zinc-400 flex items-start gap-3">
+                    <svg class="w-5 h-5 text-amber-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <div>
+                        <span class="font-semibold text-zinc-200 block mb-0.5">Location:</span>
+                        {{ config('app.shop_address') }}
+                        <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode(config('app.shop_address')) }}" target="_blank" rel="noopener"
+                           class="block mt-1.5 text-amber-400 hover:underline font-semibold">Open in Google Maps &rarr;</a>
+                    </div>
+                </div>
+            @endif
 
         </div>
 
@@ -178,6 +199,17 @@
                             <dt class="text-zinc-400">Date</dt><dd class="text-zinc-100">{{ $b['date'] }}</dd>
                             <dt class="text-zinc-400">Time</dt><dd class="text-zinc-100">{{ $b['time'] }}</dd>
                         </dl>
+                        @if(! empty($b['barber_whatsapp']))
+                            @php
+                                $waText = "Hi {$b['barber']}, I just booked at " . config('app.name') . ".\n"
+                                    . "Booking code: {$b['code']}\nName: {$b['name']}\nService: {$b['service']}\nDate: {$b['date']}\nTime: {$b['time']}";
+                            @endphp
+                            <a href="https://wa.me/{{ $b['barber_whatsapp'] }}?text={{ urlencode($waText) }}" target="_blank" rel="noopener"
+                               class="mt-4 flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold uppercase tracking-wide shadow-lg">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm4.5 12.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3a.5.5 0 0 0 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.5-.3Z"/></svg>
+                                WhatsApp {{ $b['barber'] }}
+                            </a>
+                        @endif
                     </div>
                 @endif
 
@@ -226,7 +258,7 @@
                         <label class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-2">
                             2. Pick a Date <span class="text-amber-400">*</span>
                         </label>
-                        <div class="flex gap-2 overflow-x-auto pb-2 snap-x">
+                        <div class="slot-scroll flex gap-2 overflow-x-auto pb-2 snap-x">
                             @for($i = 0; $i < 14; $i++)
                                 @php
                                     $d      = today()->addDays($i);
@@ -258,11 +290,12 @@
                         <p id="slot-message" class="text-xs text-zinc-400 py-4 text-center rounded-xl border border-dashed border-zinc-800">
                             Choose a service and a date to see available times.
                         </p>
-                        <div id="slot-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-2"></div>
+                        <div id="slot-grid" class="slot-scroll grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-60 overflow-y-auto pr-1"></div>
+                        <p id="scroll-hint" class="hidden text-[10px] text-zinc-500 text-center mt-1">Scroll for more times ↓</p>
                         <input type="hidden" name="booking_time" id="booking-time" value="{{ old('booking_time') }}">
 
                         <p class="text-[11px] text-zinc-500 mt-3">
-                            💈 A barber will be assigned to you automatically. You'll see who in your booking receipt.
+                            💈 A barber will be assigned to you automatically. You'll see who in your booking receipt, and can WhatsApp them directly.
                         </p>
                     </div>
 
@@ -322,6 +355,11 @@
         .slot-btn:not(:disabled):hover { background: rgba(245, 158, 11, .18); }
         .slot-btn:disabled { border-color: transparent; background: #27272a; color: #52525b; text-decoration: line-through; cursor: not-allowed; }
         .slot-btn[aria-pressed="true"] { background: #f59e0b; border-color: #f59e0b; color: #09090b; }
+        /* Dark, thin scrollbars for the date chips and time grid */
+        .slot-scroll { scrollbar-width: thin; scrollbar-color: rgba(245, 158, 11, .5) transparent; }
+        .slot-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .slot-scroll::-webkit-scrollbar-track { background: transparent; }
+        .slot-scroll::-webkit-scrollbar-thumb { background: rgba(245, 158, 11, .45); border-radius: 999px; }
     </style>
     <script>
         (function () {
@@ -356,8 +394,12 @@
                 dateInput.value = value;
             }
 
+            let requestNo = 0; // only the latest request may draw the slots
+
             async function loadSlots() {
+                const myRequest = ++requestNo;
                 grid.innerHTML = '';
+                document.getElementById('scroll-hint').classList.add('hidden');
                 updateSummary();
 
                 if (!service.value)   return showMessage('Choose a service first to see available times.');
@@ -368,6 +410,8 @@
                     const params = new URLSearchParams({ service_id: service.value, date: dateInput.value });
                     const res  = await fetch('{{ route('booking.slots') }}?' + params, { headers: { 'Accept': 'application/json' } });
                     const data = await res.json();
+                    if (myRequest !== requestNo) return; // a newer request is running - ignore this old one
+                    grid.innerHTML = '';
 
                     if (!res.ok)                          return showMessage('Please choose a valid date.');
                     if (!data.slots || !data.slots.length) return showMessage(data.message || 'No times available on this day.');
@@ -396,6 +440,9 @@
                     });
                     if (!keepSelected) timeInput.value = '';
                     updateSummary();
+                    document.getElementById('scroll-hint').classList.toggle('hidden', grid.scrollHeight <= grid.clientHeight);
+                    const chosenBtn = grid.querySelector('[aria-pressed="true"]');
+                    if (chosenBtn) chosenBtn.scrollIntoView({ block: 'nearest' });
                 } catch (e) {
                     showMessage('Could not load times. Please check your connection and try again.');
                 }

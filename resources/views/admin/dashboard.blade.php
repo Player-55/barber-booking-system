@@ -102,8 +102,8 @@
             </div>
         </div>
 
-        <!-- Status filter (keeps the chosen date) -->
-        <div class="flex flex-wrap gap-2 text-xs py-4">
+        <!-- Status filter (keeps the chosen date) + walk-in button -->
+        <div class="flex flex-wrap items-center gap-2 text-xs py-4">
             @foreach($filters as $value => $label)
                 @php $active = ($status ?? null) === ($value ?: null); @endphp
                 <a href="{{ route('admin.dashboard', ['date' => $dateParam, 'status' => $value ?: null]) }}"
@@ -112,6 +112,10 @@
                     <span class="opacity-70">({{ $value ? $dayBookings->where('status', $value)->count() : $dayBookings->count() }})</span>
                 </a>
             @endforeach
+            @unless($selected->lt(today()))
+                <a href="{{ route('admin.walkin.create', ['date' => $dateParam]) }}"
+                   class="ml-auto px-3 py-1.5 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-500 shadow-md">+ Walk-in</a>
+            @endunless
         </div>
 
         <!-- Bookings of the chosen day, earliest first -->
@@ -141,8 +145,13 @@
                             </td>
                             <td class="px-3 py-3">
                                 <p class="font-bold text-zinc-100">{{ $booking->customer_name }}</p>
-                                <a href="https://wa.me/6{{ ltrim($booking->customer_phone, '6') }}" target="_blank" rel="noopener"
-                                   class="text-[10px] text-zinc-500 font-mono hover:text-emerald-400">{{ $booking->customer_phone }}</a>
+                                @if($booking->customer_phone)
+                                    <a href="https://wa.me/6{{ ltrim($booking->customer_phone, '6') }}" target="_blank" rel="noopener"
+                                       class="text-[10px] text-zinc-500 font-mono hover:text-emerald-400">{{ $booking->customer_phone }}</a>
+                                @endif
+                                @if(str_starts_with($booking->booking_code, 'WI-'))
+                                    <span class="inline-block text-[9px] font-bold uppercase px-1.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">Walk-in</span>
+                                @endif
                             </td>
                             <td class="px-3 py-3">
                                 <p class="text-zinc-200">{{ $booking->service->name ?? 'N/A' }}</p>
