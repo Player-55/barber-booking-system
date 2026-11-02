@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Barbershop logo">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fde68a"/>
+      <stop offset="0.5" stop-color="#f59e0b"/>
+      <stop offset="1" stop-color="#b45309"/>
+    </linearGradient>
+    <radialGradient id="bg" cx="50%" cy="40%" r="65%">
+      <stop offset="0" stop-color="#1c2333"/>
+      <stop offset="1" stop-color="#0b0f19"/>
+    </radialGradient>
+    <path id="arcTop" d="M 36 100 A 64 64 0 0 1 164 100"/>
+    <path id="arcBottom" d="M 24 100 A 76 76 0 0 0 176 100"/>
+  </defs>
+
+  <!-- Badge -->
+  <circle cx="100" cy="100" r="96" fill="url(#bg)" stroke="url(#gold)" stroke-width="4"/>
+  <circle cx="100" cy="100" r="86" fill="none" stroke="url(#gold)" stroke-width="1" opacity="0.55"/>
+  <circle cx="100" cy="100" r="57" fill="none" stroke="url(#gold)" stroke-width="1.5"/>
+
+  <!-- Curved text -->
+  <text font-family="Georgia, 'Times New Roman', serif" font-size="14" font-weight="700" letter-spacing="4" fill="url(#gold)">
+    <textPath href="#arcTop" startOffset="50%" text-anchor="middle">BARBERSHOP</textPath>
+  </text>
+  <text font-family="Georgia, 'Times New Roman', serif" font-size="10.5" font-weight="700" letter-spacing="3" fill="url(#gold)">
+    <textPath href="#arcBottom" startOffset="50%" text-anchor="middle">BOOKING · SYSTEM</textPath>
+  </text>
+
+  <!-- Side diamonds -->
+  <path d="M 29 95 L 33 100 L 29 105 L 25 100 Z" fill="url(#gold)"/>
+  <path d="M 171 95 L 175 100 L 171 105 L 167 100 Z" fill="url(#gold)"/>
+
+  <!-- Scissors -->
+  <g fill="url(#gold)">
+    <polygon points="90,119 95,122 123,63 118,60"/>
+    <polygon points="110,119 105,122 77,63 82,60"/>
+  </g>
+  <g fill="none" stroke="url(#gold)" stroke-width="4">
+    <circle cx="85" cy="129" r="9"/>
+    <circle cx="115" cy="129" r="9"/>
+  </g>
+  <circle cx="100" cy="104.5" r="3.5" fill="#0b0f19" stroke="url(#gold)" stroke-width="2"/>
+
+  <!-- Small sparkles -->
+  <path d="M 100 52 l 2 5 l 5 2 l -5 2 l -2 5 l -2 -5 l -5 -2 l 5 -2 Z" fill="#fde68a" transform="translate(0,-2) scale(1)" opacity="0.9"/>
+</svg>
